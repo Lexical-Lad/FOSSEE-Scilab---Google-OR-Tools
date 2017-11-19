@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ *
+ * This help file was generated from fshortestpath.sci using help_from_sci().
+ *
+ -->
+
+<refentry version="5.0-subset Scilab" xml:id="fshortestpath" xml:lang="en"
+          xmlns="http://docbook.org/ns/docbook"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+          xmlns:svg="http://www.w3.org/2000/svg"
+          xmlns:ns3="http://www.w3.org/1999/xhtml"
+          xmlns:mml="http://www.w3.org/1998/Math/MathML"
+          xmlns:scilab="http://www.scilab.org"
+          xmlns:db="http://docbook.org/ns/docbook">
+
+  <refnamediv>
+    <refname>fshortestpath</refname>
+    <refpurpose>Computes the shortest/minimum-cost path for a given graph using an implementation of the 'Bellman Ford' algorithm for weighted digraphs.</refpurpose>
+  </refnamediv>
+
+
+<refsynopsisdiv>
+   <title>Calling Sequence</title>
+   <synopsis>
+   [mincost,shortestpath]=fshortestpath(start_nodes,end_nodes,weights,st)
+   [mincost,shortestpath]=fshortestpath(start_nodes,end_nodes,weights,st,disconnected_distance)
+   [mincost,shortestpath,flag]=fshortestpath(start_nodes,end_nodes,weights,st)
+   [mincost,shortestpath,flag]=fshortestpath(start_nodes,end_nodes,weights,st,disconnected_distance)
+   
+   </synopsis>
+</refsynopsisdiv>
+
+<refsection>
+   <title>Parameters</title>
+   <variablelist>
+   <varlistentry><term>start_nodes :</term>
+      <listitem><para> a [1xn] vector (if the graph has 'n' arcs, for instance) of integral values which stores the numerical label of the start-nodes (tail-nodes) for each arc of the graph.</para></listitem></varlistentry>
+   <varlistentry><term>end_nodes :</term>
+      <listitem><para> a [1xn] vector of integral values which stores the numerical label of the end-nodes (head-nodes) for each arc of the graph.</para></listitem></varlistentry>
+   <varlistentry><term>weights :</term>
+      <listitem><para> a [1xn] vector of integral values which stores the weights/traversal costs for each of the edges/arcs of the given graph. Eg.-The weight at index 'i' of this vector refers to the cost/weight of the arc defined by start_node[i]-&gt;end_node[i].</para></listitem></varlistentry>
+   <varlistentry><term>st :</term>
+      <listitem><para> a [1x2] vector which stores the numerical-label of the source node and the target node respectively.</para></listitem></varlistentry>
+   <varlistentry><term>disconnected_distance :</term>
+      <listitem><para> a singular integral value which indicates that all the weight values greater than or equal to itself essentially mean a non-existent arc/edge/path, i.e. those edges of the given graph will not be considered for the current test. (allows testing with different threshold values if need be)</para></listitem></varlistentry>
+   <varlistentry><term>mincost :</term>
+      <listitem><para> an integral value denoting the minimum possible cost incurred in traversing from the source node to the target node (summation of weights/costs of all the edges/arcs included in the shortest path, if any)</para></listitem></varlistentry>
+   <varlistentry><term>shortestpath :</term>
+      <listitem><para> Returns a vector containing the nodes(the numerical tags thereof) lying on the shortest path from source to target, if one exists.</para></listitem></varlistentry>
+   <varlistentry><term>flag :</term>
+      <listitem><para> flag variable indicating if there exists a path between the given source and target nodes(0-&gt; no path exists; 1-&gt; path exists(ipso facto, a minimal-cost path exists)</para></listitem></varlistentry>
+   </variablelist>
+</refsection>
+
+<refsection>
+   <title>Description</title>
+   <para>
+<latex>\text{A staple of graph theory, the \textbf{`Shortest Path' problem } vies to find the least-cost, hence ``shortest" path between any two given nodes in a \textbf{weighted digraph}}^{*}\text{. Essentially a linear programming problem at its core, it is one of the most studied optimization problems.}
+\text{}\\
+\text{}\\
+\text{The routine uses an implementation of the `Bellman Ford single-source shortest path algorithm for weighted digraphs'(negative weights supported)}
+\text{}\\
+\text{Bellman–Ford is based on the principle of relaxation, in which an approximation to the correct distance is gradually replaced by more accurate values until eventually reaching the optimum solution.\\The approximate distance to each vertex is always an overestimate of the true distance, and is replaced by the minimum of its old value with the length of a newly found path.\\Bellman–Ford algorithm, unlike the contemporary Dijkstra's shortest path algorithm, simply relaxes all the edges, and does this (|V|-1) times, where |V| is the number of vertices in the graph. In each of these repetitions, the number of vertices with correctly calculated distances grows, from which it follows that eventually all vertices will have their correct distances.\\This method allows the Bellman–Ford algorithm to be applied to a wider class of inputs than Dijkstra's algorithm(Dijkstra's doesn't support negative edges).\\
+Bellman–Ford runs in O(|V|.|E|) time, where |V| and |E| are the number of vertices and edges respectively.}\\
+\text{}\\
+\text{}\\
+\text{}\\
+^{*}\text{\underline{\textbf{Weighted Digraph}} : A weighted digraph is a graph in which each edge has a ``weight" associated with it. The \textbf{``weight" } is any quantity of practical significance to the problem, like distance, electrical resistance, etc. Moreover, the edges of the graph are directionally constrained, i.e. an edge from node `a' to node `b' entails neither the existence of an edge from node `b' to node `a' nor the same weight.}\\
+\text{}\\
+\text{}\\
+\text{}\\
+\text{\textbf{\underline{MATHEMATICAL STATEMENT} :}}\\
+\text{}\\
+\text{}\\
+\text{}\\
+</latex>
+<latex>
+\begin{math}
+\text{Let } N= \left(V,E\right) \text{be a network with } s,t \in V \text{denoting the source and target nodes in } N\text{, respectively.}\\
+\text{Let } w_{ij} \text{ denote the cost for the edge } i \to j.\\\\
+\textbf{\underline{Objective} :}
+\text{}\quad Maximize \quad \sum_{i,j \in A} w_{ij}x_{ij} \text{ ;}\\\\
+\text{ } \qquad \hspace{4em} \text{ Subject to } x \geq 0.\\
+\text{ }\qquad \hspace{4em} \text{ Also, } \sum_{j}x_{ij} - \sum_{j} x_{ji} = \begin{cases}
+1, \quad if\text{ }i=s\text{;}\\
+-1, \quad if\text{ }i=t\text{;}\\
+0, \quad \text{ otherwise;}\\
+\end{cases} \quad \forall \quad i \text{ ;}\\
+\end{math}
+</latex>
+   </para>
+   <para>
+   </para>
+   <para>
+</para>
+</refsection>
+
+<refsection>
+   <title>Examples</title>
+   <programlisting role="example"><![CDATA[
+start_nodes = [0, 0, 0, 1, 1, 2, 2, 3, 3]
+end_nodes = [1, 2, 3, 2, 4, 3, 4, 2, 4]
+weights = [20, 30, 10, 40, 30, 10, 20, 5, 20]
+st=[0,4]
+[mincost,shortestpath,flag]=fshortestpath(start_nodes,end_nodes,weights,st)
+//Press Enter to continue
+//Output :
+//Shortest path from start-node:0 to end-node:4 is :
+//0 -> 3 -> 4
+//Minumum cost (using the said path) :- 30.000000
+
+
+   ]]></programlisting>
+</refsection>
+
+<refsection>
+   <title>Examples</title>
+   <programlisting role="example"><![CDATA[
+specifying disconnected-distance
+start_nodes = [0, 0, 0, 1, 1, 2, 2, 3, 3]
+end_nodes = [1, 2, 3, 2, 4, 3, 4, 2, 4]
+weights = [20, 30, 10, 10, 30, 10, 20, 5, 30]
+st=[0,4]
+disconnected_distance=30
+[mincost,shortestpath,flag]=fshortestpath(start_nodes,end_nodes,weights,st)
+//Press Enter to continue
+//Output
+//Shortest path from start-node:0 to end-node:4 is :
+//0 -> 3 -> 2 -> 4
+//Minumum cost (using the said path) :- 35.000000
+//Shortest/Lowest Cost Path found.
+
+
+   ]]></programlisting>
+</refsection>
+
+<refsection>
+   <title>Examples</title>
+   <programlisting role="example"><![CDATA[
+start_nodes = [1, 1, 2, 2, 3, 3, 0]
+end_nodes = [2, 4, 3, 4, 2, 4, 5]
+weights = [40, 30, 10, 20, 5, 20, 30]
+st=[0,4]
+[mincost,shortestpath,flag]=fshortestpath(start_nodes,end_nodes,weights,st)
+//Press Enter to continue
+//No path connecting start-node: 0 and end-node=: 4.
+//No Solution![0 , 4]
+
+
+   ]]></programlisting>
+</refsection>
+
+<refsection>
+   <title>Examples</title>
+   <programlisting role="example"><![CDATA[
+start_nodes=[ 0 0 1 1 2 4 5 4];
+end_nodes= [ 1 5 2 5 3 3 4 2];
+weights=[10 8 5 2 7 10 10 8];
+st=[0,3]
+[mincost,shortestpath,flag]=fshortestpath(start_nodes,end_nodes,weights,st)
+//Press Enter to continue
+//Output
+//Shortest path from start-node:0 to end-node:3 is :
+//0 -> 1 -> 2 -> 3
+//Minumum cost (using the said path) :- 22.000000
+// Shortest/Lowest Cost Path found.
+
+
+   ]]></programlisting>
+</refsection>
+
+<refsection>
+   <title>Authors</title>
+   <simplelist type="vert">
+   <member>Samuel Wilson</member>
+   </simplelist>
+</refsection>
+</refentry>

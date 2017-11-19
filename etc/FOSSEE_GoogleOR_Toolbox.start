@@ -1,0 +1,64 @@
+// Copyright (C) 2008 - INRIA
+// Copyright (C) 2009 - DIGITEO
+
+// This file is released under the 3-clause BSD license. See COPYING-BSD.
+
+function toolbox_googleor = startModule()
+
+  TOOLBOX_NAME  = "FOSSEE_GoogleOR_Toolbox";
+  TOOLBOX_TITLE = "FOSSEE GoogleOR Toolbox";
+
+  mprintf("Start " + TOOLBOX_TITLE + "\n");
+
+  if isdef("toolbox_googleor") then
+    warning("FOSSEE GoogleOR Toolbox library is already loaded");
+    return;
+  end
+
+  etc_tlbx  = get_absolute_file_path("FOSSEE_GoogleOR_Toolbox.start");
+  etc_tlbx  = getshortpathname(etc_tlbx);
+  root_tlbx = strncpy( etc_tlbx, length(etc_tlbx)-length("\etc\") );
+
+  //Load functions library
+  // =============================================================================
+    mprintf("\tLoad macros\n");
+    pathmacros = pathconvert( root_tlbx ) + "macros" + filesep();
+    toolbox_googleor = lib(pathmacros);
+
+  // load gateways
+  // =============================================================================
+    verboseMode = ilib_verbose();
+    ilib_verbose(0);
+    mprintf("\tLoad libraries & gateways\n");
+    [a, opt] = getversion();
+    ARCH = opt(2);
+    LIB_DIR = [root_tlbx + '/thirdparty/linux/lib/' + ARCH];
+    link(LIB_DIR + '/libortools.so');
+    link(LIB_DIR + '/libcvrptw_lib.so');
+    link(LIB_DIR + '/libdimacs.so');
+    link(LIB_DIR + '/libfap.so');
+    link(LIB_DIR + '/libjniortools.so');
+    exec(pathconvert(root_tlbx+"/sci_gateway/loader_gateway.sce",%f));
+
+  // Load and add help chapter
+  // =============================================================================
+    if or(getscilabmode() == ["NW";"STD"]) then
+      mprintf("\tLoad help\n");
+      path_addchapter = pathconvert(root_tlbx+"/jar");
+      if ( isdir(path_addchapter) <> [] ) then
+        add_help_chapter(TOOLBOX_NAME, path_addchapter, %F);
+      end
+    end
+
+  // Load demos
+  // =============================================================================
+    if or(getscilabmode() == ["NW";"STD"]) then
+      mprintf("\tLoad demos\n");
+      pathdemos = pathconvert(root_tlbx + "/demos/" + TOOLBOX_NAME + ".dem.gateway.sce", %F, %T);
+      add_demo(TOOLBOX_TITLE, pathdemos);
+    end
+
+endfunction
+
+toolbox_googleor = startModule();
+clear startModule; // remove startModule on stack

@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ *
+ * This help file was generated from linsum.sci using help_from_sci().
+ *
+ -->
+
+<refentry version="5.0-subset Scilab" xml:id="linsum" xml:lang="en"
+          xmlns="http://docbook.org/ns/docbook"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+          xmlns:svg="http://www.w3.org/2000/svg"
+          xmlns:ns3="http://www.w3.org/1999/xhtml"
+          xmlns:mml="http://www.w3.org/1998/Math/MathML"
+          xmlns:scilab="http://www.scilab.org"
+          xmlns:db="http://docbook.org/ns/docbook">
+
+  <refnamediv>
+    <refname>linsum</refname>
+    <refpurpose>Solves problem with finding minimum cost of assignment</refpurpose>
+  </refnamediv>
+
+
+<refsynopsisdiv>
+   <title>Calling Sequence</title>
+   <synopsis>
+   [cost, assignment] = linsum(kNumLeftNodes, kNumRightNodes, kCost)
+   [cost, assignment, status] = linsum(kNumLeftNodes, kNumRightNodes, kCost)
+   
+   </synopsis>
+</refsynopsisdiv>
+
+<refsection>
+   <title>Parameters</title>
+   <variablelist>
+   <varlistentry><term>kNumLeftNodes :</term>
+      <listitem><para> a double, Number of Left Nodes / Jobs</para></listitem></varlistentry>
+   <varlistentry><term>kNumRightNodes :</term>
+      <listitem><para> a double, Number of Right Nodes / Workers</para></listitem></varlistentry>
+   <varlistentry><term>kCost :</term>
+      <listitem><para> a matrix of double, kNumLeftNodes x kNumRightNodes, represents Cost of assigning a Job to a Worker</para></listitem></varlistentry>
+   <varlistentry><term>cost :</term>
+      <listitem><para> a double, Optimal (minimum) Cost</para></listitem></varlistentry>
+   <varlistentry><term>assignment :</term>
+      <listitem><para> a matrix of boolean, kNumLeftNodes x kNumRightNodes, represents Optimal Assignment for the Problem</para></listitem></varlistentry>
+   <varlistentry><term>status :</term>
+      <listitem><para> contains the exit flag of Solver. Currently 0 for Not Optimal, 1 for Optimal.</para></listitem></varlistentry>
+   </variablelist>
+</refsection>
+
+<refsection>
+   <title>Description</title>
+   <para>
+Find the minimum cost and assignment for a given set of jobs and workers
+   </para>
+   <para>
+The routine uses Google ORtools for solving the quadratic problem, ORtools is a library written in C++.
+   </para>
+   <para>
+<latex>
+\text{}\\
+\begin{align}
+&amp; \text{minimize} &amp;&amp; \texttt{kCost}\text{ . }\texttt{assignment}\\
+&amp; \text{subject to} &amp;&amp; \sum_{i=0}^{\texttt{kNumLeftNodes}} \texttt{assignment}_{ij} = 1 \\
+&amp;&amp;&amp; \sum_{j=0}^{\texttt{kNumRightNodes}} \texttt{assignment}_{ij} = 1
+\end{align}\\
+\text{}\\
+\text{}\\
+\text{}\\
+</latex>
+   </para>
+   <para>
+</para>
+</refsection>
+
+<refsection>
+   <title>Examples</title>
+   <programlisting role="example"><![CDATA[
+//Ref :
+//http://www.hungarianalgorithm.com/examplehungarianalgorithm.php
+
+kNumLeftNodes = 4;
+kNumRightNodes = 4;
+kCost = [82, 83, 69, 92; 77, 37, 49, 92; 11, 69, 5, 86; 8, 9, 98, 23];
+[cost, assignment, status] = linsum(kNumLeftNodes, kNumRightNodes, kCost);
+cost
+assignment
+status
+
+   ]]></programlisting>
+</refsection>
+
+<refsection>
+   <title>Authors</title>
+   <simplelist type="vert">
+   <member>Souvik Das</member>
+   </simplelist>
+</refsection>
+</refentry>

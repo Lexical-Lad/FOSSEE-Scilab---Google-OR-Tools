@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ *
+ * This help file was generated from vrp.sci using help_from_sci().
+ *
+ -->
+
+<refentry version="5.0-subset Scilab" xml:id="vrp" xml:lang="en"
+          xmlns="http://docbook.org/ns/docbook"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+          xmlns:svg="http://www.w3.org/2000/svg"
+          xmlns:ns3="http://www.w3.org/1999/xhtml"
+          xmlns:mml="http://www.w3.org/1998/Math/MathML"
+          xmlns:scilab="http://www.scilab.org"
+          xmlns:db="http://docbook.org/ns/docbook">
+
+  <refnamediv>
+    <refname>vrp</refname>
+    <refpurpose>Solves the classic 'Vehicle Routing Problem' (VRP for short) heuristically to find the optimal set of routes for a fleet of vehicles delivering goods or services to various locations. The routine makes use of the routing library from the Google-OR-Tools framework. The algorithm first employs a cheapest path approach for an initial naive solution and then 'local search' heuristics to improve it toward an optimal solution.</refpurpose>
+  </refnamediv>
+
+
+<refsynopsisdiv>
+   <title>Calling Sequence</title>
+   <synopsis>
+   [total_distance,routes] = vrp(adj_matrix,vehicles,start)
+   [total_distance,routes] = vrp(adj_matrix,vehicles,start,labels)
+   [total_distance,routes] = vrp(adj_matrix,vehicles,start,labels,demands,max_vehicle_capacity)
+   [total_distance,routes] = vrp(adj_matrix, vehicles,start,labels,demands,max_vehicle_capacity,service_time_per_demand)
+   [total_distance,routes] = vrp(adj_matrix, vehicles,start,labels,demands,max_vehicle_capacity,service_time_per_demand,time_windows)
+   [total_distance,routes] = vrp(adj_matrix, vehicles,start,labels,demands,max_vehicle_capacity,service_time_per_demand,time_windows,speeds)
+   [total_distance,routes] = vrp(adj_matrix, vehicles,start,labels,demands,max_vehicle_capacity,service_time_per_demand,time_windows,speeds,waiting_times)
+   [total_distance,routes] = vrp(adj_matrix, vehicles,start,labels,demands,max_vehicle_capacity,service_time_per_demand,time_windows,speeds,waiting_times,refuel_flag,fuel_capacity,refuel_nodes)
+   [total_distance,routes] = vrp(adj_matrix, vehicles,start,labels,demands,max_vehicle_capacity,service_time_per_demand,time_windows,speeds,waiting_times,refuel_flag,fuel_capacity,refuel_nodes,penalty)
+   [total_distance,routes] = vrp(adj_matrix, vehicles,start,labels,demands,max_vehicle_capacity,service_time_per_demand,time_windows,speeds,waiting_times,refuel_flag,fuel_capacity,refuel_nodes,penalty,groups,group_penalty)
+   [total_distance,routes] = vrp(adj_matrix, vehicles,start,labels,demands,max_vehicle_capacity,service_time_per_demand,time_windows,speeds,waiting_times,refuel_flag,fuel_capacity,refuel_nodes,penalty,groups,group_penalty,time_limit)
+   [total_distance,routes,distances] = vrp(...)
+   [total_distance,routes,distances,total_time] = vrp(...)
+   [total_distance,routes,distances,total_time,times] = vrp(...)
+   [total_distance,routes,distances,total_time,times,status] = vrp(...)
+   
+   </synopsis>
+</refsynopsisdiv>
+
+<refsection>
+   <title>Parameters</title>
+   <variablelist>
+   <varlistentry><term>**NOTE :</term>
+      <listitem><para> for the sake of simplicity, henceforth 'v' would denote the number of vehicles in the problem and 'n', the number of nodes in the graph</para></listitem></varlistentry>
+   <varlistentry><term>adj_matrix :</term>
+      <listitem><para> It is an [nxn] matrix of integral values, representing the graph (nodes indexed from '1' to 'n') for which the given VRP is to be solved. adj_matrix[i][j] gives the distance from node 'i' to 'j'.(can be different from adj_matrix[j][i]; asymmetric VRP). A negative value indicates the absence of a path from 'i' to 'j'.</para></listitem></varlistentry>
+   <varlistentry><term>vehicles :</term>
+      <listitem><para> It is an integral value representing the number of vehicles in the fleet, such that we need to find a optimum route for each vehicle, to minimize the total distance and total time.</para></listitem></varlistentry>
+   <varlistentry><term>start :</term>
+      <listitem><para> It is a matrix of integral values, pertaining to the index of the starting node(s) or depot(s). The dimensions of this matrix is germane to the type of VRP given, hence determines the pertinent solution strategy. The variations are :-<itemizedlist><listitem>[1x1] - A single integral value - indicating a single depot. All vehicles start and end their journey at this node.</listitem><listitem>[ ] - Empty Matrix - indicating that the vehicle routes can start and end at any node, defining a taxi-service-like scenario.</listitem><listitem>[vx2] - An integral matrix specifying particular start and end nodes for each vehicle ( multiple depot case). start[x][0] -> Start node index for vehicle 'x' ; start[x][1] -> End node for vehicle 'x'.</listitem></itemizedlist></para></listitem></varlistentry>
+   <varlistentry><term>labels :</term>
+      <listitem><para> Optional functionality to provide string labels to the nodes of the graph. It is a [1xn] vector of strings.</para></listitem></varlistentry>
+   <varlistentry><term>demands :</term>
+      <listitem><para> It is a [1xn] vector of integral values indicating the demands for the various nodes to be fulfiled by the vehicles. demands[x] denotes the demand of node 'x'. (Demands obviously cannot be negative).</para></listitem></varlistentry>
+   <varlistentry><term>max_vehicle_capacity :</term>
+      <listitem><para> It is an integral value specifying the maximum capacity of each vehicle (same for all). If capacitated VRP (demands specified), this has to be provided and must be POSITIVE. Can be '0' or empty matrix for non-capacitated VRP.</para></listitem></varlistentry>
+   <varlistentry><term>service_time_per_demand :</term>
+      <listitem><para> It a single integral value indicating the time required to service one unit of demand in capacitated VRP.</para></listitem></varlistentry>
+   <varlistentry><term>time_windows :</term>
+      <listitem><para> It is an [nx2] matrix of integral values specifying particular windows of time only within which the different nodes can be serviced. time_windows[x][0]-&gt;start of service window for node x ; time_windows[x][1]-&gt;end of service window for node 'x'. Can be empty if no time-window constraints. If provided, for a node with no such restriction, provide '0' and '-1'. Time starts from '0' for the model.</para></listitem></varlistentry>
+   <varlistentry><term>speeds :</term>
+      <listitem><para> It is a matrix of integral values specifying the speed of the vehicles. The variations are :-<itemizedlist><listitem> empty matrix - Indicates that transit times are to be ignored while minimizing total-time for the optimal route.</listitem><listitem> [1x1] - single value - Same avg. speed for all vehicles between any two nodes.</listitem><listitem> [nxn] - A matrix specifying different avg.speeds between different nodes. speed[x][y]-> Gives the average speed while going from node 'x' to node 'y'. (Asymmetric speeds supported)</listitem></itemizedlist></para></listitem></varlistentry>
+   <varlistentry><term>waiting_times :</term>
+      <listitem><para> a [1xn] vector of integral values containing the waiting times, if any, at the nodes. Could be empty if no waiting constraints.</para></listitem></varlistentry>
+   <varlistentry><term>refuel_flag :</term>
+      <listitem><para> a single integral value indicating if fuel constraints are to be considered or not.(Default : '0')<itemizedlist><listitem>  '0'->No fuel constraints</listitem><listitem>  '1' ->Fuel constraints to be included in the model.</listitem></itemizedlist></para></listitem></varlistentry>
+   <varlistentry><term>fuel_capacity :</term>
+      <listitem><para> a single integral value specifying the fuel capacity of the vehicles under consideration (same for all). Need to be provided if refueling constraints active. Needs to be positive.</para></listitem></varlistentry>
+   <varlistentry><term>refuel_nodes :</term>
+      <listitem><para> It is a [1xA] vector of integral values (A-&gt; no. of refuel nodes), containing the indices of refueling nodes. Could be empty indicating the absence of refuel nodes.</para></listitem></varlistentry>
+   <varlistentry><term>penalty :</term>
+      <listitem><para> It is an [Ax2] matrix containing the cost penalties for skipping certain optional nodes (A-&gt;no. of optional nodes). penalty[x][0]-&gt; The index of the optional node ; penalty[x][1]-&gt; The cost penalty associated with that node.</para></listitem></varlistentry>
+   <varlistentry><term>groups :</term>
+      <listitem><para> It is an [AxB] matrix of integral values specifying groups of nodes that must lie on the same vehicle route. A-&gt; No. of groups. B-&gt; Size of the largest group. Each row contains the indices of a separate group. Smaller groups are padded with '0's on the right.</para></listitem></varlistentry>
+   <varlistentry><term>group_penalty :</term>
+      <listitem><para> It is a single integral value specifying the cost penalty incurred if a node from a group is unable to be serviced by the same vehicle in the optimal solution. This value is mandatory if group constraints are included in the model. (The model tends to minimize total distance and total time, while amassing minimal cost penalties ( legible tradeoffs to minimize distance ). USE -1, if the groups are to be strictly imposed (cannot exclude a node from a group while vying to minimize distance). This value CAN be zero, indicating that grouping constraints are purely optional. Default value : -1.</para></listitem></varlistentry>
+   <varlistentry><term>time_limit :</term>
+      <listitem><para> It is the maximum time (in milliseconds; integral value) for which the optimizer is allowed to run. If by the end of this time, the engine is unable to find even an initial solution, a timeout error status is returned. If, however, an initial solution is found, but not fully optimized yet (in the process of heuristically improving it), it will return the current solution, albeit not optimal, as the final solution. This value cannot be zero. Default : 10 seconds.</para></listitem></varlistentry>
+   <varlistentry><term>total_distance :</term>
+      <listitem><para> It is the summation of the total distance for all the routes in the optimal solution, if any.</para></listitem></varlistentry>
+   <varlistentry><term>routes :</term>
+      <listitem><para>  It is a [vxn] matrix containing the routes for the vehicles in the optimal solution, if any. (padded with 0's on the right)</para></listitem></varlistentry>
+   <varlistentry><term>distances :</term>
+      <listitem><para> It is a [1xv] vector containing the distances covered by the various routes in the optimal solution.</para></listitem></varlistentry>
+   <varlistentry><term>total_time :</term>
+      <listitem><para> It is the summation of the times taken by the various vehicles to complete their journeys.</para></listitem></varlistentry>
+   <varlistentry><term>times :</term>
+      <listitem><para> It is a [1xv] vector containing the individual times taken by the vehicles to complete their routes.</para></listitem></varlistentry>
+   <varlistentry><term>status :</term>
+      <listitem><para> It is the enumerated "flag" value returned by the Google OR tools Routing Library, indicating the status of the solution.(Details in the description)</para></listitem></varlistentry>
+   </variablelist>
+</refsection>
+
+<refsection>
+   <title>Description</title>
+   <para>
+<latex>
+\text{The \textbf{`Vehicle Routing Problem' } is a combinatorial optimization and linear integer programming problem in graph theory.\\A superset of the well-known \textbf{Travelling Salesman Problem}, it vies to find an optimal set of non-overlapping routes for a fleet of vehicles (the anecdotal ``salesmen"), passing through a given set of cities(nodes in the graph) starting from one or more starting nodes called the \textbf{`depot(s)'}.\\In the pursuit of optimality, it tends to minimize the \textbf{total distance } across all the routes and/or other parameters specified by the user, like \textbf{`time'}, \textbf{`cost'}, etc.}\\
+\text{}\\
+\text{}\\
+\text{}\\
+\text{\textbf{\underline{MATHEMATICAL\textbf{ }STATEMENT} :}}\\
+\text{}\\
+\text{}\\
+\text{}\\
+</latex>
+<latex>
+\begin{math}
+\text{Let } N= \left(V,E\right) \text{denote the specified graph}\\
+\text{Let } c_{ij} \text{ denote the distance from } i \to j.\\\\
+\textbf{\underline{Objective} : }\quad Minimize \quad \sum_{i \in V} \sum_{j \in V} c_{ij} x_{ij} \\\\\\
+\text{Subject to :} \qquad
+\sum_{i\in V} x_{ij} = 1 \quad \forall \quad j \in V\backslash\{0\}\qquad (1) \\\\
+\text{}\\
+\text{}\qquad \hspace{3em} \qquad \sum_{j\in V} x_{ij} = 1 \quad \forall \quad i \in V\backslash\{0\}\qquad \text{ } (2) \\\\
+\text{}\\
+\text{}\qquad \hspace{3em} \qquad \sum_{i\in V} x_{i0} = K\quad \text{;} \qquad \hspace{3em} \qquad\text{ } (3)\\\\
+\text{}\\
+\text{}\qquad \hspace{3em} \qquad \sum_{j\in V} x_{0j} = K\quad \text{;} \qquad \hspace{3em} \qquad\text{ } (4)\\\\
+\text{}\\
+\text{}\qquad \hspace{3em} \qquad x_{ij} \in \{0,1\} \quad \forall \quad i,j \in  V \text{ ; } \hspace{3em} \text{ }  (5)\\\\
+\text{}\\
+\end{math}
+\text{}\\
+\text{}\\
+</latex>
+   </para>
+   <para>
+<latex>
+\text{}\\
+\text{}\\
+\text{(1), (2) specify that exactly one arc enters and one arc leaves each node in the solution.}\\
+\text{}\\
+\text{(3), (4) specify that the total number of leaving the depot is equal to the total number entering it(single depot mode).}
+\text{}\\
+\text{}\\
+\text{}\\
+</latex>
+   </para>
+   <para>
+Legend :
+   </para>
+   <para>
+status - Integral value returned by the Google OR Tools Routing library, indicating the status of the solution for the current VRP
+<itemizedlist>
+<listitem>status=0    -    ROUTING_NOT_SOLVED (Before the solver is invoked)            </listitem>
+<listitem>status=1    -    ROUTING_SUCCESS    (TSP solved successfully(optimal solution found)    </listitem>
+<listitem>status=2    -    ROUTING_FAIL(No solution found)                        </listitem>
+<listitem>status=3    -    ROUTING_FAIL_TIMEOUT    (solution was taking too long; Timed out)    </listitem>
+</itemizedlist>
+   </para>
+   <para>
+For more details, refer to  :     https://en.wikipedia.org/wiki/Vehicle_routing_problem
+   </para>
+   <para>
+or to :                 https://developers.google.com/optimization/routing/tsp/vehicle_routing#cvrp
+   </para>
+   <para>
+The problem is also related to the HAMILTONIAN PATH problem : https://en.wikipedia.org/wiki/Hamiltonian_path
+   </para>
+   <para>
+   </para>
+   <para>
+</para>
+</refsection>
+
+<refsection>
+   <title>Examples</title>
+   <programlisting role="example"><![CDATA[
+//INPUT:
+adj_matrix =     [0, 2451,  713, 1018, 1631, 1374, 2408,  213, 2571,  875, 1420, 2145, 1972;
+2451,    0, 1745, 1524,  831, 1240,  959, 2596,  403, 1589, 1374,  357,  579;
+713, 1745,    0,  355,  920,  803, 1737,  851, 1858,  262,  940, 1453, 1260;
+1018, 1524,  355,    0,  700,  862, 1395, 1123, 1584,  466, 1056, 1280,  987;
+1631,  831,  920,  700,    0,  663, 1021, 1769,  949,  796,  879,  586,  371;
+1374, 1240,  803,  862,  663,    0, 1681, 1551, 1765,  547,  225,  887,  999;
+2408,  959, 1737, 1395, 1021, 1681,    0, 2493,  678, 1724, 1891, 1114,  701;
+213, 2596,  851, 1123, 1769, 1551, 2493,    0, 2699, 1038, 1605, 2300, 2099;
+2571,  403, 1858, 1584,  949, 1765,  678, 2699,    0, 1744, 1645,  653,  600;
+875, 1589,  262,  466,  796,  547, 1724, 1038, 1744,    0,  679, 1272, 1162;
+1420, 1374,  940, 1056,  879,  225, 1891, 1605, 1645,  679,    0, 1017, 1200;
+2145,  357, 1453, 1280,  586,  887, 1114, 2300,  653, 1272, 1017,    0,  504;
+1972,  579, 1260,  987,  371,  999,  701, 2099,  600, 1162,  1200,  504,   0];
+
+labels = ["New York", "Los Angeles", "Chicago", "Minneapolis", "Denver", "Dallas", "Seattle", "Boston", "San Francisco", "St. Louis", "Houston", "Phoenix", "Salt Lake City"];
+
+start = 1;
+
+vehicles = 3;
+
+demands = [0, 19, 21, 6, 19, 7, 12, 16, 6, 16, 8, 14, 21 ];
+
+service_time_per_demand=3;
+
+max_vehicle_capacity = 60;
+
+[total_distance,routes] = vrp(adj_matrix, vehicles,start,labels,demands,max_vehicle_capacity,service_time_per_demand);
+
+   ]]></programlisting>
+</refsection>
+
+<refsection>
+   <title>Examples</title>
+   <programlisting role="example"><![CDATA[
+adj_matrix =     [0, 2451,  713, 1018, 1631, 1374, 2408,  213, 2571,  875, 1420, 2145, 1972;
+2451,    0, 1745, 1524,  831, 1240,  959, 2596,  403, 1589, 1374,  357,  579;
+713, 1745,    0,  355,  920,  803, 1737,  851, 1858,  262,  940, 1453, 1260;
+1018, 1524,  355,    0,  700,  862, 1395, 1123, 1584,  466, 1056, 1280,  987;
+1631,  831,  920,  700,    0,  663, 1021, 1769,  949,  796,  879,  586,  371;
+1374, 1240,  803,  862,  663,    0, 1681, 1551, 1765,  547,  225,  887,  999;
+2408,  959, 1737, 1395, 1021, 1681,    0, 2493,  678, 1724, 1891, 1114,  701;
+213, 2596,  851, 1123, 1769, 1551, 2493,    0, 2699, 1038, 1605, 2300, 2099;
+2571,  403, 1858, 1584,  949, 1765,  678, 2699,    0, 1744, 1645,  653,  600;
+875, 1589,  262,  466,  796,  547, 1724, 1038, 1744,    0,  679, 1272, 1162;
+1420, 1374,  940, 1056,  879,  225, 1891, 1605, 1645,  679,    0, 1017, 1200;
+2145,  357, 1453, 1280,  586,  887, 1114, 2300,  653, 1272, 1017,    0,  504;
+1972,  579, 1260,  987,  371,  999,  701, 2099,  600, 1162,  1200,  504,   0];
+
+labels = ["New York", "Los Angeles", "Chicago", "Minneapolis", "Denver", "Dallas", "Seattle", "Boston", "San Francisco", "St. Louis", "Houston", "Phoenix", "Salt Lake City"];
+
+start = [] ;
+
+vehicles = 3;
+
+demands = [0, 19, 21, 6, 19, 7, 12, 16, 6, 16, 8, 14, 21 ];
+
+service_time_per_demand=3;
+
+max_vehicle_capacity = 60;
+
+[total_distance,routes] = vrp(adj_matrix, vehicles,start,labels,demands,max_vehicle_capacity,service_time_per_demand);
+
+
+   ]]></programlisting>
+</refsection>
+
+<refsection>
+   <title>Authors</title>
+   <simplelist type="vert">
+   <member>Samuel Wilson</member>
+   </simplelist>
+</refsection>
+</refentry>

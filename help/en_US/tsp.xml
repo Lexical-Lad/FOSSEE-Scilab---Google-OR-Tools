@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ *
+ * This help file was generated from tsp.sci using help_from_sci().
+ *
+ -->
+
+<refentry version="5.0-subset Scilab" xml:id="tsp" xml:lang="en"
+          xmlns="http://docbook.org/ns/docbook"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+          xmlns:svg="http://www.w3.org/2000/svg"
+          xmlns:ns3="http://www.w3.org/1999/xhtml"
+          xmlns:mml="http://www.w3.org/1998/Math/MathML"
+          xmlns:scilab="http://www.scilab.org"
+          xmlns:db="http://docbook.org/ns/docbook">
+
+  <refnamediv>
+    <refname>tsp</refname>
+    <refpurpose>Solves the classic 'Travelling Salesman Problem' heuristically using the routing library from the Google-OR-tools framework. The algorithm first employs a cheapest path approach for an initial solution and then 'local search' heuristics to improve the initial solution toward an optimal one.</refpurpose>
+  </refnamediv>
+
+
+<refsynopsisdiv>
+   <title>Calling Sequence</title>
+   <synopsis>
+   [mincost,path]=tsp(adj_matrix,start_node)
+   [mincost,path]=tsp(adj_matrix,start_node,labels)
+   [mincost,path,status]=tsp(adj_matrix,start_node)
+   [mincost,path,status]=tsp(adj_matrix,start_node, labels)
+   
+   </synopsis>
+</refsynopsisdiv>
+
+<refsection>
+   <title>Parameters</title>
+   <variablelist>
+   <varlistentry><term>adj_matrix :</term>
+      <listitem><para> It is an [nxn] Adjacency Matrix of integral values, representing the graph (having 'n' nodes, for instance, numbered from '1' to 'n') for which the Travelling Saleman Problem is to be solved. Value adj_matrix(i,j) represents the cost of travelling from node 'i' to node 'j' of the given graph. Asymmetric graphs are also supported, where adj(i,j) &lt;&gt; adj(j,i). A negative value for cost (adj_matrix(i,j)) is simply interpreted as the absence of an edge from node 'i' to node 'j'.</para></listitem></varlistentry>
+   <varlistentry><term>start_node :</term>
+      <listitem><para> It is the index of the starting node. The optimal path must start and end at this node.</para></listitem></varlistentry>
+   <varlistentry><term>labels :</term>
+      <listitem><para> Optional functionality to provide string labels to the nodes of the graph. It is a [1xn] vector of strings. (labels(i) is the label given to the node 'i' of the graph</para></listitem></varlistentry>
+   <varlistentry><term>time_limit :</term>
+      <listitem><para> It is the maximum time (in milliseconds; integral value) for which the optimizer is allowed to run. If by the end of this time, the engine is unable to find even an initial solution, a timeout error status is returned. If, however, an initial solution is found, but not fully optimized yet (in the process of heuristically improving it), it will return the current solution, albeit not optimal, as the final solution. This value cannot be zero. Default : 1 second.</para></listitem></varlistentry>
+   <varlistentry><term>mincost :</term>
+      <listitem><para> It is an integral value denoting the minimum cost incurred by the "salesman" in traversing the optimal path according to the solution, should one exist.)</para></listitem></varlistentry>
+   <varlistentry><term>path :</term>
+      <listitem><para>  It is a [1x(n+1)] vector containing indices of nodes in the order of the path to be followed in the optimal solution, should one exist. The first and the last values in this vector are equal to the 'start_node' index provided.</para></listitem></varlistentry>
+   <varlistentry><term>status :</term>
+      <listitem><para> It is the enumerated "flag" value returned by the Google OR tools Routing Library, indicating the status of the solution.(Details in the description)</para></listitem></varlistentry>
+   </variablelist>
+</refsection>
+
+<refsection>
+   <title>Description</title>
+   <para>
+<latex>
+\text{The \textbf{`Travelling Salesman Problem' } is a classic optimization problem which, given a graph (wherein each edge has some cost/distance associated with it), and an arbitrary `starting node' , vies to find such a path over the said graph so as to visit every vertex exactly once and ending back at the `start\_node' \textbf{(Hamiltonian path) }, while minimizing the total cost/distance of the journey.\\This is aptly explained by the namesake analogy of a `salesman' who needs to decide upon a path through various cities (nodes) while minimizing his travel distance, hence the travel expenditures.\\Travelling salesman problem is essentially a special case of the \textbf{Vehicle Routing Problem}.\\This routine utlizes the 'Routing Model' from the Google OR Tools framework to solve the problem. A \textbf{`cheapest addition' } heuristic is applied to find the initial solution and then \textbf{`local search' } is used to improve it toward an optimal solution.\\\textbf{Asymmetric Travelling Saleman Problem } is also supported, where the cost of travelling from city `i' to city `j' is not the same as cost of travelling from city `j' to city `i' (In this case, the input adjacency matrix is simply not a symmetric matrix)}\\
+\text{}\\
+\text{}\\
+\text{}\\
+\text{\textbf{\underline{MATHEMATICAL\textbf{ }STATEMENT} :}}\\
+\text{}\\
+\text{}\\
+\text{}\\
+</latex>
+   </para>
+   <para>
+<latex>
+\begin{math}
+\text{Let }x_{ij} = \begin{cases}
+1 \quad \text{; if there exists a path from node i to j}\\
+0 \quad \text{; otherwise}\\
+\end{cases}\\\\
+\text{Let their be `n' nodes in the problem}\\
+\text{Let } c_{ij} \text{ be the distance from node i to node j}\\\\
+\text{Let }u_{i} \text{ be a dummy variable for } i=1,2,...,n \text{ ;}\\\\
+\textbf{\underline{Objective }:}\qquad Minimize \sum_{i=1}^{n} \sum_{j \neq i, j=1}^{n} c_{ij} x_{ij} \\\\
+\text{ Subject to :}
+\text{ }\qquad 0 \leq x_{ij} \leq 1 \text{ ;} \qquad i,j = 1,2,...,n \text{ ;}\qquad \hspace{3em} \qquad (1)\\\\
+\text{ }\qquad \hspace{3em} \text{ } \qquad u_{i} \in Z \text{ ; }\qquad \qquad i = 1,2,...,n \text{ ; }\qquad \hspace{3em} \qquad  \text{ }(2)\\\\
+\text{ }\qquad \hspace{3em} \text{ } \qquad \sum_{i=1,i\neq j}^{n} x_{ij}=1 \text{ ; } j=1,2,...,n \text{ ; } \qquad \hspace{3em} \qquad  (3)\\\\
+\text{ }\qquad \hspace{3em} \text{ } \qquad \sum_{j=1,j\neq i}^{n} x_{ij}=1 \text{ ; } i=1,2,...,n \text{ ; } \qquad \hspace{3em} \qquad  (4)\\\\
+\text{ }\qquad \hspace{3em} \text{ } \qquad u_{i} - u_{j} + n x_{ij} \leq n-1 \text{ ; }\qquad 2\leq i\neq j \leq n \text{ ; } \qquad (5)\\\\
+\text{ (3),(4) enforce that each node can only be arrived from exactly one other node.}\\\\
+\text{ (5) enforces that there's only a single tour connecting all the node ( Hamiltonian cycle) }
+\end{math}
+\text{}\\
+\text{}\\
+\text{}\\
+\text{}\\
+</latex>
+   </para>
+   <para>
+Legend :
+   </para>
+   <para>
+status - Integral value returned by the Google OR Tools Routing library, indicating the status of the solution for the current TSP
+<itemizedlist>
+<listitem>status=0    -    ROUTING_NOT_SOLVED (Before the solver is invoked)            </listitem>
+<listitem>status=1    -    ROUTING_SUCCESS    (TSP solved successfully(optimal solution found)    </listitem>
+<listitem>status=2    -    ROUTING_FAIL(No solution found)                        </listitem>
+<listitem>status=3    -    ROUTING_FAIL_TIMEOUT    (solution was taking too much time; Timed out)    </listitem>
+</itemizedlist>
+   </para>
+   <para>
+For more details, refer to  :     https://en.wikipedia.org/wiki/Travelling_salesman_problem
+   </para>
+   <para>
+or to :                 https://developers.google.com/optimization/routing/tsp/tsp
+   </para>
+   <para>
+The problem is also related to the HAMILTONIAN PATH problem : https://en.wikipedia.org/wiki/Hamiltonian_path
+   </para>
+   <para>
+   </para>
+   <para>
+</para>
+</refsection>
+
+<refsection>
+   <title>Examples</title>
+   <programlisting role="example"><![CDATA[
+
+adj=[0 10 50 45;
+10 0 25 25;
+50 25 0 40;
+45 25 40 0];
+
+start_node=1;
+
+[mincost,path,status]=tsp(adj,start_node);
+//Press ENTER to continue
+
+//OUTPUT :
+//'ROUTING_SUCCESS' ; An optimal solution was found
+//Minimum cost -> 120
+//Optimal Path :-
+//1 ->2 ->3 ->4 ->1
+
+   ]]></programlisting>
+</refsection>
+
+<refsection>
+   <title>Examples</title>
+   <programlisting role="example"><![CDATA[
+
+adj=[0 10 15 20;
+10 0 35 25;
+15 35 0 30;
+20 25 30 0];
+
+start_node=1;
+
+labels=['A' 'B' 'C' 'D'];
+[mincost,path,status]=tsp(adj,start_node,labels);
+//Press ENTER to continue
+//
+//OUTPUT :
+//'ROUTING_SUCCESS' ; An optimal solution was found
+//Minimum cost -> 80
+//Optimal Path :-
+// A (1) -> B (2) -> D (4) -> C (3) ->A (1)
+
+   ]]></programlisting>
+</refsection>
+
+<refsection>
+   <title>Examples</title>
+   <programlisting role="example"><![CDATA[
+
+adj=[0 1 2 1 1;
+1 0 1 2 1;
+2 1 0 1 2;
+1 2 1 0 2;
+1 1 2 2 0];
+
+start_node=1;
+
+labels=['alpha' 'beta'  'gamma' 'theta' 'sigma'];
+
+[mincost,path,status]=tsp(adj,start_node,labels);
+//Press ENTER to continue
+
+//OUTPUT :
+//'ROUTING_SUCCESS' ; An optimal solution was found
+//Minimum cost -> 5
+//Optimal Path :-
+// alpha (1) -> sigma (5) -> beta (2) -> gamma (3) -> theta (4) ->alpha (1)
+
+   ]]></programlisting>
+</refsection>
+
+<refsection>
+   <title>Examples</title>
+   <programlisting role="example"><![CDATA[
+
+adj=[0 10 -1 -2;
+10 0 35 25;
+-1 35 0 30;
+-1 25 30 0];
+
+start_node=1;
+
+[mincost,path,status]=tsp(adj,start_node);
+//Press ENTER to continue
+//
+//OUTPUT :
+//'ROUTING_FAIL' ; No optimal solution  was found. No path starting and ending at the specified 'start node'(1) found.
+
+   ]]></programlisting>
+</refsection>
+
+<refsection>
+   <title>Authors</title>
+   <simplelist type="vert">
+   <member>Samuel Wilson</member>
+   </simplelist>
+</refsection>
+</refentry>
