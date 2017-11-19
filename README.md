@@ -6,7 +6,8 @@ https://developers.google.com/optimization/
 2. Max Flow
 3. Linear Sum Assignment
 4. Shortest Path (Bellman Ford)
-5. Travelling Salesman Problem
+5. Vehicle Routing Problem
+6. Travelling Salesman Problem
 
 ## To use:
 1. In Scilab, change the working directory to the root directory of the repository
